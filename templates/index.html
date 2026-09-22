@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% block body %}
+<div class="stats">
+<div class="stat"><b>{{ stats.count }}</b><span>عدد الطلبات</span></div>
+<div class="stat"><b>{{ stats.sales|money }}</b><span>المبيعات (ر.س)</span></div>
+<div class="stat"><b>{{ stats.paid|money }}</b><span>المدفوع</span></div>
+<div class="stat"><b class="due">{{ stats.due|money }}</b><span>المتبقي على العملاء</span></div>
+<div class="stat"><b>{{ stats.profit|money }}</b><span>{{ 'ربح المتجر قبل تكلفة الشحن' if store else 'صافي الربح بعد الشحن' }} ({{ stats.nocost }} طلب بلا تكلفة فعلية)</span></div></div>
+<form class="bar" method="get">{% if st %}<input type="hidden" name="status" value="{{ st }}">{% endif %}{% if store %}<input type="hidden" name="store" value="{{ store }}">{% endif %}<input name="q" value="{{ q }}" placeholder="بحث: اسم، رقم طلب، واتساب">
+<button>بحث</button><a class="btn" href="{{ url_for('shipments') }}" style="margin-inline-start:auto;background:#fff;color:var(--ac);border:1px solid var(--ac)">الشحنات</a><a class="btn" href="{{ url_for('edit') }}">طلب جديد</a></form>
+<div class="bar chips"><span>الحالة:</span><a href="{{ url_for('index', store=store or None) }}" class="{{ '' if st else 'on' }}">الكل</a>
+{% for s in STATUSES %}<a href="{{ url_for('index', status=s, store=store or None) }}" class="{{ 'on' if st==s }}">{{ s }} ({{ counts.get(s,0) }})</a>{% endfor %}</div>
+<div class="bar chips"><span>المتجر:</span><a href="{{ url_for('index', status=st or None) }}" class="{{ '' if store else 'on' }}">كل المتاجر</a>
+{% for x in STORES %}<a href="{{ url_for('index', store=x, status=st or None) }}" class="{{ 'on' if store==x }}">{{ x }} ({{ store_counts.get(x,0) }})</a>{% endfor %}</div>
+<div class="wrap"><table>
+<tr><th>الطلب</th><th>العميل</th><th>الإجمالي</th><th>المدفوع</th><th>المتبقي</th><th>الدفع</th><th>الربح</th><th>الحالة</th><th>الشحنة</th><th></th></tr>
+{% for o in orders %}<tr>
+<td><b>{{ o.code }}</b><br><small>{{ o.store }}</small></td>
+<td>{{ o.customer_name }} <a href="https://wa.me/{{ o.wa }}" target="_blank" rel="noopener">واتساب</a></td>
+<td>{{ o.total|money }}</td><td>{{ o.paid|money }}</td>
+<td class="{{ 'due' if o.remaining>0 and o.status!='ملغي' }}">{{ o.remaining|money }}</td><td>{{ o.pay_status }}</td><td>{{ (o.profit|money) if o.profit is not none else '' }}</td>
+<td><form method="post" action="{{ url_for('set_status', oid=o.id) }}"><input type="hidden" name="_csrf" value="{{ csrf }}">
+<select name="status" onchange="this.form.submit()">{% for s in STATUSES %}<option {{ 'selected' if s==o.status }}>{{ s }}</option>{% endfor %}</select></form></td>
+<td>{{ o.shipment_code or '' }}</td><td><a href="{{ url_for('edit', oid=o.id) }}">تعديل</a> &nbsp; <a href="{{ url_for('send_update', oid=o.id) }}">إرسال تحديث</a></td></tr>
+{% else %}<tr><td colspan="10">لا توجد طلبات بعد. اضغط «طلب جديد» لإضافة أول طلب.</td></tr>{% endfor %}
+</table></div>{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}{% block body %}
+<h2>{{ o.code or 'طلب جديد' }}</h2>
+<form method="post" class="grid"><input type="hidden" name="_csrf" value="{{ csrf }}">
+<label>المتجر<select name="store">{% for x in STORES %}<option {{ 'selected' if x==(o.store or STORES[0]) }}>{{ x }}</option>{% endfor %}</select></label>
+<label>اسم العميل<input name="customer_name" value="{{ o.customer_name or '' }}" required></label>
+<label>واتساب (مع رمز الدولة 967)<input name="whatsapp" value="{{ o.whatsapp or '' }}" required></label>
+<label class="full">العنوان في صنعاء<input name="address" value="{{ o.address or '' }}" required></label>
+<label class="full">الروابط / تفاصيل الطلب<textarea name="cart_link" rows="2">{{ o.cart_link or '' }}</textarea></label>
+<label>قيمة السلة (ر.س)<input name="cart_value" type="number" step="0.01" min="0" value="{{ o.cart_value or '' }}" required></label>
+<label>رسوم التوصيل داخل صنعاء (ر.س)<input name="delivery_fee" type="number" step="0.01" min="0" value="{{ o.delivery_fee or 0 }}"></label>
+<label>رسوم الخدمة (ر.س) حسب سعر الصرف<input name="service_fee" type="number" step="0.01" min="0" value="{{ o.service_fee or 0 }}"></label>
+<label>المدفوع (ر.س)<input name="paid" type="number" step="0.01" min="0" value="{{ o.paid or 0 }}"></label>
+<label>التكلفة الفعلية على المتجر (ر.س)<input name="actual_cost" type="number" step="0.01" min="0" value="{{ o.actual_cost if o.actual_cost is not none else '' }}"></label>
+<label>طريقة الدفع<select name="pay_method"><option value=""></option>{% for p in PAY_METHODS %}<option {{ 'selected' if p==o.pay_method }}>{{ p }}</option>{% endfor %}</select></label>
+<label>رقم الطلب في المتجر<input name="store_order_no" value="{{ o.store_order_no or '' }}"></label>
+<label>الشحنة<select name="shipment_code"><option value=""></option>{% for x in ships %}<option {{ 'selected' if x.code==o.shipment_code }}>{{ x.code }}</option>{% endfor %}</select></label>
+<label>حالة الطلب<select name="status">{% for s in STATUSES %}<option {{ 'selected' if s==(o.status or STATUSES[0]) }}>{{ s }}</option>{% endfor %}</select></label>
+{% if o.id %}<label>الإجمالي المطلوب / المتبقي<input readonly value="{{ o.total|money }} / {{ o.remaining|money }}"></label>{% endif %}
+<label class="full">ملاحظات<textarea name="notes" rows="2">{{ o.notes or '' }}</textarea></label>
+<button class="full">حفظ الطلب</button></form>{% endblock %}

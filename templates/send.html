@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block body %}
+<h2>إرسال تحديث: {{ o.code }} - {{ o.customer_name }}</h2>
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<canvas id="card" width="1080" height="1350" style="width:380px;max-width:100%;border:1px solid var(--line);border-radius:6px;background:#fff"></canvas>
+<div style="flex:1;min-width:260px">
+<div class="grid" style="margin-bottom:12px"><div class="full"><b>نص الرسالة</b><pre style="white-space:pre-wrap;font:inherit;margin:6px 0 0">{{ wa_text(o) }}</pre></div></div>
+<p>1) افتح واتساب وأرسل النص. 2) انسخ الصورة والصقها في المحادثة (Ctrl+V) وأرسلها.</p>
+<div class="bar"><a class="btn" href="{{ wa_update(o) }}" target="_blank" rel="noopener">فتح واتساب بالنص</a>
+<button id="copy">نسخ الصورة</button><a class="btn" id="dl" download="{{ o.code }}.png" href="#">تحميل الصورة</a></div>
+<p id="msg" style="color:var(--mut)"></p></div></div>
+<script src="{{ url_for('static', filename='card.js') }}"></script>
+<script>initCard(document.getElementById("card"), {{ card|tojson }}, "{{ url_for('static', filename='logo.png') }}",
+  {dl: document.getElementById("dl"), copy: document.getElementById("copy"), msg: document.getElementById("msg")});</script>
+{% endblock %}

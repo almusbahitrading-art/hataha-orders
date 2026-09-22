@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block body %}
+<div class="login">
+<img src="{{ url_for('static', filename='brand.jpg') }}" alt="هاتها - اطلبها .. نوصلها لك">
+<form method="post"><input type="hidden" name="_csrf" value="{{ csrf }}">
+<h2>تسجيل الدخول</h2><p>لوحة متابعة الطلبات</p>
+<label>اسم المستخدم<input name="user" required autofocus></label>
+<label>كلمة المرور<input name="password" type="password" required></label>
+<button>دخول</button></form></div>{% endblock %}

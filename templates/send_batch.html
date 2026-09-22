@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block body %}
+<h2>إرسال تحديث لعملاء الشحنة {{ s.code }}</h2>
+{% if not orders %}<p>لا توجد طلبات في هذه الشحنة. اربط الطلبات بها من صفحة تعديل كل طلب.</p>
+{% else %}
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<div><canvas id="card" width="1080" height="1350" style="width:340px;max-width:100%;border:1px solid var(--line);border-radius:6px;background:#fff"></canvas>
+<div class="bar" style="margin-top:10px"><button id="copy">نسخ الصورة</button><a class="btn" id="dl" download="{{ s.code }}.png" href="#">تحميل الصورة</a></div>
+<p id="msg" style="color:var(--mut)"></p></div>
+<div style="flex:1;min-width:300px">
+<form method="get" class="bar"><label>المرحلة اللي تبلّغهم بها:
+<select name="status" onchange="this.form.submit()">{% for x in STATUSES[:-1] %}<option {{ 'selected' if x==st }}>{{ x }}</option>{% endfor %}</select></label></form>
+<p>1) اضغط «نسخ الصورة» مرة واحدة ولا تنسخ شيئاً آخر بعدها. 2) لكل عميل: اضغط «فتح واتساب»، أرسل النص، ثم الصق الصورة (Ctrl+V) وأرسلها.</p>
+<div class="wrap"><table style="min-width:0"><tr><th>الطلب</th><th>العميل</th><th></th></tr>
+{% for o in orders %}<tr><td><b>{{ o.code }}</b></td><td>{{ o.customer_name }}</td>
+<td><a class="btn send" href="{{ wa_update(o, st) }}" target="_blank" rel="noopener">فتح واتساب</a></td></tr>{% endfor %}
+</table></div></div></div>
+<script src="{{ url_for('static', filename='card.js') }}"></script>
+<script>initCard(document.getElementById("card"), {{ card|tojson }}, "{{ url_for('static', filename='logo.png') }}",
+  {dl: document.getElementById("dl"), copy: document.getElementById("copy"), msg: document.getElementById("msg")});
+document.querySelectorAll(".send").forEach(a => a.addEventListener("click", () => { a.textContent = "تم ✓"; a.style.background = "var(--ink)"; }));</script>
+{% endif %}{% endblock %}

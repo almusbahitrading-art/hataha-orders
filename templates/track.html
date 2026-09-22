@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block head %}<meta name="robots" content="noindex"><meta name="referrer" content="no-referrer"><style>
+.trk{max-width:520px;margin:0 auto}
+.trk .card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:22px}
+.trk .logo{display:block;height:64px;margin:0 auto 14px}
+.steps{list-style:none;margin:18px 0 0;padding:0}
+.steps li{position:relative;padding:0 34px 18px 0;color:var(--mut)}
+.steps li::before{content:"";position:absolute;right:0;top:4px;width:16px;height:16px;border-radius:50%;border:2px solid var(--line);background:#fff}
+.steps li::after{content:"";position:absolute;right:7px;top:22px;bottom:0;width:2px;background:var(--line)}
+.steps li:last-child::after{display:none}
+.steps li.done{color:var(--ink)}.steps li.done::before{background:var(--ink);border-color:var(--ink)}
+.steps li.now{color:var(--ink);font-weight:700}.steps li.now::before{background:var(--ac);border-color:var(--ac);box-shadow:0 0 0 4px #c5102a26}
+</style>{% endblock %}
+{% block body %}<div class="trk"><div class="card">
+<img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="هاتها">
+<h2>أهلاً {{ o.customer_name.split()[0] }}</h2>
+<p>طلبك رقم <b>{{ o.code }}</b></p>
+{% if o.status == 'ملغي' %}<div class="err">تم إلغاء هذا الطلب. للاستفسار تواصل معنا على واتساب.</div>
+{% else %}<ol class="steps">{% for s in steps %}<li class="{{ 'done' if loop.index0 < i else ('now' if loop.index0 == i else '') }}">{{ s }}</li>{% endfor %}</ol>{% endif %}
+</div><p style="text-align:center;color:var(--mut)">اطلبها .. نوصلها لك</p></div>{% endblock %}

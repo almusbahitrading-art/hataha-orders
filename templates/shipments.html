@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block body %}
+<h2>الشحنات</h2>
+<form method="post" class="grid"><input type="hidden" name="_csrf" value="{{ csrf }}">
+<label>تاريخ الإرسال<input name="sent_on" type="date"></label>
+<label>تكلفة الشحنة (ر.س)<input name="cost" type="number" step="0.01" min="0" value="0"></label>
+<label class="full">ملاحظات (شركة الشحن أو المسافر)<input name="notes"></label>
+<button class="full">إضافة شحنة</button></form>
+<div class="wrap" style="margin-top:16px"><table>
+<tr><th>الشحنة</th><th>التاريخ</th><th>الطلبات (اضغط لإرسال تحديث)</th><th>التكلفة</th><th>تحديث حالة كل الطلبات</th><th>ملاحظات</th></tr>
+{% for s, n in rows %}<tr><td><b>{{ s.code }}</b></td><td>{{ s.sent_on or '' }}</td><td><details><summary>{{ n|length }} طلب</summary>{% for o in n %}<div><a href="{{ url_for('send_update', oid=o.id) }}">{{ o.code }} - {{ o.customer_name }}</a></div>{% endfor %}</details><a class="btn" href="{{ url_for('send_batch', sid=s.id) }}">إرسال للكل</a></td>
+<td><form method="post" action="{{ url_for('shipment_cost', sid=s.id) }}" style="display:flex;gap:6px"><input type="hidden" name="_csrf" value="{{ csrf }}"><input name="cost" type="number" step="0.01" min="0" value="{{ s.cost }}" style="width:110px"><button>حفظ</button></form></td>
+<td><form method="post" action="{{ url_for('shipment_status', sid=s.id) }}" onsubmit="return confirm('تغيير حالة كل طلبات هذه الشحنة؟')" style="display:flex;gap:6px"><input type="hidden" name="_csrf" value="{{ csrf }}"><select name="status"><option>ضمن شحنة</option><option>وصل صنعاء</option></select><button>تحديث</button></form></td>
+<td>{{ s.notes or '' }}</td></tr>
+{% else %}<tr><td colspan="6">لا توجد شحنات. أضف شحنة ثم اختارها في الطلبات اللي داخل الصندوق.</td></tr>{% endfor %}
+</table></div>
+<p><a href="{{ url_for('index') }}">رجوع للطلبات</a></p>{% endblock %}
